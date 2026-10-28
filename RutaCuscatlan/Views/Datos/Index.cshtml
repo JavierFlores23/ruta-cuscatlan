@@ -1,0 +1,105 @@
+@model DatosAdminViewModel
+@{
+    ViewData["Title"] = "Datos almacenados";
+}
+<section class="data-page">
+    <div class="wrap">
+        <p class="eyebrow">Administración · SQLite</p>
+        <div class="data-heading">
+            <div>
+                <h1>Datos almacenados</h1>
+                <p class="lead">Consulta las tablas de Ruta Cuscatlán. Las contraseñas no se muestran.</p>
+            </div>
+            <span class="data-total">@Model.TotalRegistros registros en total</span>
+        </div>
+
+        <nav class="data-nav" aria-label="Secciones de datos">
+            <a href="#destinos">Destinos</a><a href="#tours">Tours</a><a href="#reservas">Reservas</a>
+            <a href="#clientes">Clientes</a><a href="#catalogos">Catálogos</a><a href="#usuarios">Usuarios</a>
+        </nav>
+
+        <div class="data-summary">
+            <a href="#destinos"><strong>@Model.Destinos.Count</strong><span>Destinos</span></a>
+            <a href="#tours"><strong>@Model.Tours.Count</strong><span>Tours</span></a>
+            <a href="#reservas"><strong>@Model.Reservas.Count</strong><span>Reservas</span></a>
+            <a href="#clientes"><strong>@Model.Clientes.Count</strong><span>Clientes</span></a>
+            <a href="#usuarios"><strong>@Model.Usuarios.Count</strong><span>Usuarios</span></a>
+        </div>
+
+        <section id="destinos" class="data-section">
+            <div class="data-section-heading"><div><p class="eyebrow">Lugares</p><h2>Destinos <span>@Model.Destinos.Count</span></h2></div></div>
+            @if (Model.Destinos.Count == 0) { <p class="data-empty">Todavía no hay destinos guardados.</p> }
+            else
+            {
+                <div class="scroll"><table class="data-table">
+                    <thead><tr><th>Foto</th><th>Destino</th><th>Departamento</th><th>Categoría</th><th>Descripción</th><th>Crédito</th><th>Estado</th></tr></thead>
+                    <tbody>
+                    @foreach (var d in Model.Destinos)
+                    {
+                        <tr>
+                            <td>@if (!string.IsNullOrWhiteSpace(d.ImagenUrl)) { <img class="data-thumb" src="@d.ImagenUrl" alt="Foto de @d.Nombre" loading="lazy" /> }</td>
+                            <td><strong>@d.Nombre</strong></td><td>@d.Departamento?.Nombre</td><td>@d.Categoria?.Nombre</td><td class="description-cell">@d.Descripcion</td>
+                            <td>@d.ImagenCredito@if (!string.IsNullOrWhiteSpace(d.ImagenFuente) && Uri.TryCreate(d.ImagenFuente, UriKind.Absolute, out var source) && source.Scheme == Uri.UriSchemeHttps) { <a class="source-link" href="@source.AbsoluteUri" target="_blank" rel="noopener noreferrer">Fuente/licencia</a> }</td>
+                            <td><span class="status-pill @(d.Activo ? "is-active" : "is-off")">@(d.Activo ? "Activo" : "Oculto")</span></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table></div>
+            }
+        </section>
+
+        <section id="tours" class="data-section">
+            <div class="data-section-heading"><div><p class="eyebrow">Salidas</p><h2>Tours <span>@Model.Tours.Count</span></h2></div></div>
+            @if (Model.Tours.Count == 0) { <p class="data-empty">Todavía no hay tours guardados.</p> }
+            else
+            {
+                <div class="scroll"><table class="data-table">
+                    <thead><tr><th>Tour</th><th>Destino</th><th>Fecha</th><th>Precio</th><th>Cupos disponibles</th><th>Guía</th><th>Estado</th></tr></thead>
+                    <tbody>@foreach (var t in Model.Tours) { <tr><td><strong>@t.Titulo</strong></td><td>@t.Destino?.Nombre</td><td>@t.FechaSalida.ToString("dd/MM/yyyy HH:mm")</td><td>$@t.Precio.ToString("0.00")</td><td>@t.Disponibles / @t.CupoMaximo</td><td>@(t.Guia?.Nombre ?? "Sin asignar")</td><td>@(t.Activo ? "Activo" : "Inactivo")</td></tr> }</tbody>
+                </table></div>
+            }
+        </section>
+
+        <section id="reservas" class="data-section">
+            <div class="data-section-heading"><div><p class="eyebrow">Compras</p><h2>Reservas <span>@Model.Reservas.Count</span></h2></div></div>
+            @if (Model.Reservas.Count == 0) { <p class="data-empty">Aún no hay reservas. Aparecerán aquí cuando un cliente reserve.</p> }
+            else
+            {
+                <div class="scroll"><table class="data-table">
+                    <thead><tr><th>#</th><th>Cliente</th><th>Tour</th><th>Personas</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead>
+                    <tbody>@foreach (var r in Model.Reservas) { <tr><td>@r.Id</td><td>@r.Cliente?.Nombre</td><td>@r.Tour?.Titulo</td><td>@r.CantidadPersonas</td><td>$@r.Total.ToString("0.00")</td><td><span class="status-pill @(r.Estado == "Cancelada" ? "is-off" : "is-active")">@r.Estado</span></td><td>@r.FechaReserva.ToString("dd/MM/yyyy HH:mm")</td></tr> }</tbody>
+                </table></div>
+            }
+        </section>
+
+        <section id="clientes" class="data-section">
+            <div class="data-section-heading"><div><p class="eyebrow">Personas</p><h2>Clientes <span>@Model.Clientes.Count</span></h2></div></div>
+            @if (Model.Clientes.Count == 0) { <p class="data-empty">Aún no hay clientes registrados.</p> }
+            else
+            {
+                <div class="scroll"><table class="data-table">
+                    <thead><tr><th>#</th><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Reservas</th></tr></thead>
+                    <tbody>@foreach (var c in Model.Clientes) { <tr><td>@c.Id</td><td>@c.Nombre</td><td>@c.Correo</td><td>@(c.Telefono ?? "—")</td><td>@c.Reservas.Count</td></tr> }</tbody>
+                </table></div>
+            }
+        </section>
+
+        <section id="catalogos" class="data-section">
+            <div class="data-section-heading"><div><p class="eyebrow">Organización</p><h2>Catálogos <span>@(Model.Departamentos.Count + Model.Categorias.Count + Model.Guias.Count)</span></h2></div></div>
+            <div class="data-columns">
+                <div><h3>Departamentos <small>@Model.Departamentos.Count</small></h3><ul class="data-list">@foreach (var d in Model.Departamentos) { <li><span>@d.Nombre</span><span>@d.Destinos.Count destinos</span></li> }</ul></div>
+                <div><h3>Categorías <small>@Model.Categorias.Count</small></h3><ul class="data-list">@foreach (var c in Model.Categorias) { <li><span>@c.Nombre</span><span>@c.Destinos.Count destinos</span></li> }</ul></div>
+                <div><h3>Guías <small>@Model.Guias.Count</small></h3><ul class="data-list">@foreach (var g in Model.Guias) { <li><span>@g.Nombre</span><span>@(g.Idiomas ?? "Idiomas sin indicar")</span></li> }</ul></div>
+            </div>
+        </section>
+
+        <section id="usuarios" class="data-section">
+            <div class="data-section-heading"><div><p class="eyebrow">Acceso</p><h2>Usuarios <span>@Model.Usuarios.Count</span></h2></div></div>
+            <div class="scroll"><table class="data-table">
+                <thead><tr><th>Correo</th><th>Rol</th><th>Cliente vinculado</th><th>Contraseña</th></tr></thead>
+                <tbody>@foreach (var u in Model.Usuarios) { <tr><td>@u.Correo</td><td><span class="status-pill @(u.Rol == "Admin" ? "is-admin" : "is-active")">@u.Rol</span></td><td>@(u.ClienteId?.ToString() ?? "—")</td><td><span class="safe-note">Hash oculto</span></td></tr> }</tbody>
+            </table></div>
+            <p class="data-footnote">Esta vista es solo para administradores. No se muestra ni se consulta el hash de contraseña.</p>
+        </section>
+    </div>
+</section>

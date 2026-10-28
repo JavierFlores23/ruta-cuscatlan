@@ -1,0 +1,12 @@
+@model RegistroViewModel
+@{ ViewData["Title"] = "Registro"; }
+<section><div class="wrap narrow">
+    <h2>Crear cuenta</h2>
+    <form method="post" class="form">
+        <label>Nombre<input asp-for="Nombre" /><span class="errtxt" asp-validation-for="Nombre"></span></label>
+        <label>Correo<input asp-for="Correo" /><span class="errtxt" asp-validation-for="Correo"></span></label>
+        <label>Teléfono (opcional)<input asp-for="Telefono" /></label>
+        <label>Contraseña<input asp-for="Password" /><span class="errtxt" asp-validation-for="Password"></span></label>
+        <button class="btn">Registrarme</button>
+    </form>
+</div></section>

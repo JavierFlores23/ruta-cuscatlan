@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"] - Ruta Cuscatlán</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Figtree:wght@400;600&display=swap">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+</head>
+<body>
+<nav>
+    <div class="wrap">
+        <a class="brand" asp-controller="Home" asp-action="Index">Ruta Cuscatlán</a>
+        <div>
+            <a asp-controller="Tours" asp-action="Catalogo">Tours</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Destinos" asp-action="Index">Destinos</a>
+                    <a asp-controller="Tours" asp-action="Index">Admin tours</a>
+                    <a asp-controller="Reservas" asp-action="Index">Reservas</a>
+                    <a asp-controller="Datos" asp-action="Index">Datos almacenados</a>
+                }
+                else
+                {
+                    <a asp-controller="Reservas" asp-action="Mis">Mis reservas</a>
+                }
+                <a asp-controller="Account" asp-action="Logout">Salir</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login">Entrar</a>
+                <a asp-controller="Account" asp-action="Registro">Registrarme</a>
+            }
+        </div>
+    </div>
+</nav>
+<main>
+    <div class="wrap">
+        @if (TempData["Ok"] is string okMsg) { <div class="msg ok">@okMsg</div> }
+        @if (TempData["Error"] is string errMsg) { <div class="msg err">@errMsg</div> }
+    </div>
+    @RenderBody()
+</main>
+<footer><div class="wrap">Ruta Cuscatlán · Proyecto de Programación 2</div></footer>
+</body>
+</html>

@@ -1,0 +1,21 @@
+@model List<Reserva>
+@{ var admin = User.IsInRole("Admin"); }
+<div class="scroll"><table>
+    <thead><tr><th>Fecha</th>@if (admin) { <th>Cliente</th> }<th>Tour</th><th>Personas</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var r in Model)
+    {
+        <tr>
+            <td>@r.FechaReserva.ToString("dd/MM/yyyy HH:mm")</td>
+            @if (admin) { <td>@r.Cliente?.Nombre</td> }
+            <td>@r.Tour?.Titulo</td><td>@r.CantidadPersonas</td><td>$@r.Total.ToString("0.00")</td><td>@r.Estado</td>
+            <td class="acts">
+                @if (r.Estado != "Cancelada")
+                {
+                    <form method="post" asp-action="Cancelar" asp-route-id="@r.Id" onsubmit="return confirm('¿Cancelar esta reserva?')"><button class="link">Cancelar</button></form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table></div>

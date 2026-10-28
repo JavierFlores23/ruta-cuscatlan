@@ -1,0 +1,17 @@
+@model Destino
+<form method="post" class="form">
+    <input type="hidden" asp-for="Id" />
+    <label>Nombre<input asp-for="Nombre" /><span class="errtxt" asp-validation-for="Nombre"></span></label>
+    <label>Descripción<textarea asp-for="Descripcion" rows="3"></textarea><span class="errtxt" asp-validation-for="Descripcion"></span></label>
+    <label>Ruta de la imagen<input asp-for="ImagenUrl" placeholder="/images/destinos/mi-destino.jpg" /></label>
+    @if (!string.IsNullOrWhiteSpace(Model.ImagenUrl))
+    {
+        <img class="destination-form-preview" src="@Model.ImagenUrl" alt="Vista previa de @Model.Nombre" />
+    }
+    <label>Crédito de la foto<input asp-for="ImagenCredito" placeholder="Autor · licencia" /></label>
+    <label>Fuente y licencia<input asp-for="ImagenFuente" type="url" placeholder="https://..." /><span class="errtxt" asp-validation-for="ImagenFuente"></span></label>
+    <label>Departamento<select asp-for="DepartamentoId" asp-items="(SelectList)ViewBag.Departamentos"></select></label>
+    <label>Categoría<select asp-for="CategoriaId" asp-items="(SelectList)ViewBag.Categorias"></select></label>
+    <label class="chk"><input asp-for="Activo" /> Activo</label>
+    <div><button class="btn">Guardar</button> <a asp-action="Index">Cancelar</a></div>
+</form>

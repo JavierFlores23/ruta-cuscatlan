@@ -1,0 +1,21 @@
+@model List<Destino>
+@{ ViewData["Title"] = "Destinos"; }
+<section><div class="wrap">
+    <h2>Destinos</h2>
+    <p><a class="btn" asp-action="Create">Nuevo destino</a></p>
+    <div class="scroll"><table>
+        <thead><tr><th>Nombre</th><th>Departamento</th><th>Categoría</th><th>Activo</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var d in Model)
+        {
+            <tr>
+                <td>@d.Nombre</td><td>@d.Departamento?.Nombre</td><td>@d.Categoria?.Nombre</td><td>@(d.Activo ? "Sí" : "No")</td>
+                <td class="acts">
+                    <a asp-action="Edit" asp-route-id="@d.Id">Editar</a>
+                    <form method="post" asp-action="Delete" asp-route-id="@d.Id" onsubmit="return confirm('¿Eliminar este destino?')"><button class="link">Eliminar</button></form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table></div>
+</div></section>

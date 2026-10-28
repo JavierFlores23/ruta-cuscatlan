@@ -1,0 +1,89 @@
+@model List<Tour>
+@{
+    ViewData["Title"] = "Tours en El Salvador";
+    var termino = ViewData["SearchTerm"] as string;
+}
+<section class="catalogue">
+    <div class="wrap">
+        <p class="eyebrow">Tu próxima salida empieza aquí</p>
+        <div class="section-heading">
+            <div>
+                <h1>Tours para conocer El Salvador</h1>
+                <p class="lead">Encuentra una ruta, revisa sus cupos y reserva en unos pasos.</p>
+            </div>
+            <span class="result-count">@Model.Count tour@(Model.Count == 1 ? "" : "s") disponible@(Model.Count == 1 ? "" : "s")</span>
+        </div>
+
+        <form method="get" asp-controller="Tours" asp-action="Catalogo" class="search-form" role="search">
+            <label for="q">Busca por destino o nombre del tour</label>
+            <div class="search-row">
+                <input id="q" name="q" type="search" value="@termino" placeholder="Ej. Suchitoto, playa, volcán" autocomplete="off">
+                <button class="btn" type="submit">Buscar tours</button>
+                @if (!string.IsNullOrWhiteSpace(termino))
+                {
+                    <a class="clear-search" asp-action="Catalogo">Limpiar</a>
+                }
+            </div>
+        </form>
+
+        @if (Model.Count == 0)
+        {
+            <div class="empty-state">
+                <h2>No encontramos tours con esa búsqueda</h2>
+                <p>Prueba con otro destino o borra el filtro para ver todas las salidas.</p>
+                <a class="btn" asp-action="Catalogo">Ver todos los tours</a>
+            </div>
+        }
+        else
+        {
+            <div class="grid tour-grid">
+                @for (var i = 0; i < Model.Count; i++)
+                {
+                    var t = Model[i];
+                    <article class="card tour-card">
+                        <div class="@("pic p" + (i % 6 + 1)) tour-photo">
+                            @if (!string.IsNullOrWhiteSpace(t.Destino?.ImagenUrl))
+                            {
+                                <img src="@t.Destino.ImagenUrl" alt="@t.Destino.Nombre" loading="lazy" />
+                            }
+                            <span class="tour-label">@t.Destino?.Categoria?.Nombre</span>
+                        </div>
+                        <div class="t">
+                            <p class="tour-destination">@t.Destino?.Nombre</p>
+                            <h2>@t.Titulo</h2>
+                            <p>@t.Descripcion</p>
+                            @if (!string.IsNullOrWhiteSpace(t.Destino?.ImagenCredito))
+                            {
+                                if (Uri.TryCreate(t.Destino.ImagenFuente, UriKind.Absolute, out var tourFotoFuente) && tourFotoFuente.Scheme == Uri.UriSchemeHttps)
+                                {
+                                    <a class="photo-credit" href="@tourFotoFuente.AbsoluteUri" target="_blank" rel="noopener noreferrer">Foto: @t.Destino.ImagenCredito · Fuente/licencia</a>
+                                }
+                                else
+                                {
+                                    <span class="photo-credit">Foto: @t.Destino.ImagenCredito</span>
+                                }
+                            }
+                            <div class="tour-meta">
+                                <span>@t.DuracionHoras horas</span>
+                                <span>Guía: @(t.Guia?.Nombre ?? "por asignar")</span>
+                            </div>
+                            <p class="departure">Salida: @t.FechaSalida.ToString("ddd dd/MM · HH:mm", new System.Globalization.CultureInfo("es-SV"))</p>
+                            <div class="tour-bottom">
+                                <div><strong class="price">$@t.Precio.ToString("0.00")</strong><span class="per-person"> / persona</span></div>
+                                <span class="seats">@t.Disponibles cupos</span>
+                            </div>
+                            @if (t.Disponibles > 0)
+                            {
+                                <a class="btn reserve-btn" asp-controller="Reservas" asp-action="Create" asp-route-tourId="@t.Id">Reservar este tour</a>
+                            }
+                            else
+                            {
+                                <span class="tag">Agotado</span>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>

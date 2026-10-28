@@ -1,0 +1,14 @@
+@model Tour
+<form method="post" class="form">
+    <input type="hidden" asp-for="Id" />
+    <label>Título<input asp-for="Titulo" /><span class="errtxt" asp-validation-for="Titulo"></span></label>
+    <label>Descripción<textarea asp-for="Descripcion" rows="3"></textarea></label>
+    <label>Destino<select asp-for="DestinoId" asp-items="(SelectList)ViewBag.Destinos"></select></label>
+    <label>Guía<select asp-for="GuiaId" asp-items="(SelectList)ViewBag.Guias"><option value="">Sin guía</option></select></label>
+    <label>Precio (USD)<input asp-for="Precio" /><span class="errtxt" asp-validation-for="Precio"></span></label>
+    <label>Duración (horas)<input asp-for="DuracionHoras" /><span class="errtxt" asp-validation-for="DuracionHoras"></span></label>
+    <label>Cupo máximo<input asp-for="CupoMaximo" /><span class="errtxt" asp-validation-for="CupoMaximo"></span></label>
+    <label>Fecha de salida<input asp-for="FechaSalida" /></label>
+    <label class="chk"><input asp-for="Activo" /> Activo</label>
+    <div><button class="btn">Guardar</button> <a asp-action="Index">Cancelar</a></div>
+</form>

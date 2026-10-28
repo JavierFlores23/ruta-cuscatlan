@@ -1,0 +1,77 @@
+@model List<Destino>
+@{ ViewData["Title"] = "Descubre El Salvador"; }
+<header class="hero">
+    <div class="wrap hero-layout">
+        <div class="hero-copy">
+            <p class="hero-kicker">Rutas locales · El Salvador</p>
+            <h1>Un país pequeño. Días que se sienten enormes.</h1>
+            <p>Explora pueblos, volcanes y costa. Encuentra una salida y reserva tu lugar desde aquí.</p>
+            <div class="hero-actions">
+                <a class="btn" asp-controller="Tours" asp-action="Catalogo">Explorar tours</a>
+                <a class="hero-secondary" href="#destinos">Conocer destinos <span aria-hidden="true">↓</span></a>
+            </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+            <span class="hero-sun"></span>
+            <span class="hero-mountain mountain-back"></span>
+            <span class="hero-mountain mountain-front"></span>
+            <span class="hero-route route-one"></span>
+            <span class="hero-route route-two"></span>
+            <span class="route-stop stop-one"></span>
+            <span class="route-stop stop-two"></span>
+            <span class="route-stop stop-three"></span>
+            <span class="hero-caption">Tu próxima ruta</span>
+        </div>
+    </div>
+</header>
+<section id="destinos" class="destinations-section">
+    <div class="wrap">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Escoge tu siguiente parada</p>
+                <h2>Destinos para salir de la rutina</h2>
+                <p class="lead">@Model.Count lugares en el catálogo. Cada ficha muestra su departamento y categoría.</p>
+            </div>
+            <a class="text-link" asp-controller="Tours" asp-action="Catalogo">Ver todos los tours <span aria-hidden="true">↗</span></a>
+        </div>
+        @if (Model.Count == 0)
+        {
+            <div class="empty-state"><h2>Estamos preparando las rutas</h2><p>Vuelve pronto para ver los destinos disponibles.</p></div>
+        }
+        else
+        {
+            <div class="grid destination-grid">
+                @for (var i = 0; i < Model.Count; i++)
+                {
+                    var d = Model[i];
+                    <article class="card destination-card">
+                        <div class="@("pic p" + (i % 6 + 1)) destination-photo">
+                            @if (!string.IsNullOrWhiteSpace(d.ImagenUrl))
+                            {
+                                <img src="@d.ImagenUrl" alt="@d.Nombre, @d.Departamento?.Nombre" loading="lazy" />
+                            }
+                            <span class="destination-category">@d.Categoria?.Nombre</span>
+                        </div>
+                        <div class="t">
+                            <p class="destination-department">@d.Departamento?.Nombre</p>
+                            <h3>@d.Nombre</h3>
+                            <p>@d.Descripcion</p>
+                            @if (!string.IsNullOrWhiteSpace(d.ImagenCredito))
+                            {
+                                if (Uri.TryCreate(d.ImagenFuente, UriKind.Absolute, out var fotoFuente) && fotoFuente.Scheme == Uri.UriSchemeHttps)
+                                {
+                                    <a class="photo-credit" href="@fotoFuente.AbsoluteUri" target="_blank" rel="noopener noreferrer">Foto: @d.ImagenCredito · Fuente/licencia</a>
+                                }
+                                else
+                                {
+                                    <span class="photo-credit">Foto: @d.ImagenCredito</span>
+                                }
+                            }
+                            <a class="card-link" asp-controller="Tours" asp-action="Catalogo" asp-route-q="@d.Nombre">Buscar tours de este destino <span aria-hidden="true">→</span></a>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>

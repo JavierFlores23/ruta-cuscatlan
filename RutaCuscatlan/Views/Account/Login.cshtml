@@ -1,0 +1,11 @@
+@model LoginViewModel
+@{ ViewData["Title"] = "Entrar"; }
+<section><div class="wrap narrow">
+    <h2>Entrar</h2>
+    <form method="post" class="form">
+        <div asp-validation-summary="ModelOnly" class="errtxt"></div>
+        <label>Correo<input asp-for="Correo" /><span class="errtxt" asp-validation-for="Correo"></span></label>
+        <label>Contraseña<input asp-for="Password" /><span class="errtxt" asp-validation-for="Password"></span></label>
+        <button class="btn">Entrar</button>
+    </form>
+</div></section>

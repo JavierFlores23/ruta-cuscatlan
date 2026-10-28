@@ -1,0 +1,11 @@
+@model ReservaViewModel
+@{ ViewData["Title"] = "Reservar"; var t = Model.Tour!; }
+<section><div class="wrap narrow">
+    <h2>Reservar: @t.Titulo</h2>
+    <p class="lead">@t.Destino?.Nombre · Sale el @t.FechaSalida.ToString("dd/MM/yyyy HH:mm") · $@t.Precio.ToString("0.00") por persona · @t.Disponibles cupos</p>
+    <form method="post" class="form">
+        <input type="hidden" asp-for="TourId" />
+        <label>Personas<input asp-for="Personas" type="number" min="1" max="@t.Disponibles" /><span class="errtxt" asp-validation-for="Personas"></span></label>
+        <div><button class="btn">Confirmar reserva</button> <a asp-controller="Tours" asp-action="Catalogo">Volver</a></div>
+    </form>
+</div></section>

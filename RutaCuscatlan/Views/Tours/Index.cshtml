@@ -1,0 +1,23 @@
+@model List<Tour>
+@{ ViewData["Title"] = "Administrar tours"; }
+<section><div class="wrap">
+    <h2>Tours</h2>
+    <p><a class="btn" asp-action="Create">Nuevo tour</a></p>
+    <div class="scroll"><table>
+        <thead><tr><th>Título</th><th>Destino</th><th>Guía</th><th>Salida</th><th>Precio</th><th>Cupos</th><th>Activo</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var t in Model)
+        {
+            <tr>
+                <td>@t.Titulo</td><td>@t.Destino?.Nombre</td><td>@t.Guia?.Nombre</td>
+                <td>@t.FechaSalida.ToString("dd/MM/yyyy HH:mm")</td><td>$@t.Precio.ToString("0.00")</td>
+                <td>@t.Disponibles / @t.CupoMaximo</td><td>@(t.Activo ? "Sí" : "No")</td>
+                <td class="acts">
+                    <a asp-action="Edit" asp-route-id="@t.Id">Editar</a>
+                    <form method="post" asp-action="Delete" asp-route-id="@t.Id" onsubmit="return confirm('¿Eliminar este tour?')"><button class="link">Eliminar</button></form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table></div>
+</div></section>
