@@ -31,26 +31,26 @@ public class ReservasController : Controller
             TempData["Error"] = "Solo las cuentas de cliente pueden reservar.";
             return RedirectToAction("Catalogo", "Tours");
         }
-        var (ok, error) = await _svc.CrearAsync(vm.TourId, cid, vm.Personas);
+        var (ok, error, reservaId) = await _svc.CrearAsync(vm.TourId, cid, vm.Personas);
         if (!ok)
         {
             TempData["Error"] = error;
             return RedirectToAction(nameof(Create), new { tourId = vm.TourId });
         }
-        TempData["Ok"] = "¡Reserva confirmada!";
-        return RedirectToAction(nameof(Mis));
+        TempData["Ok"] = $"Cupo apartado por {Models.Reserva.MinutosCupo} minutos. Completa el pago para confirmar tu reserva.";
+        return RedirectToAction("Checkout", "Pagos", new { id = reservaId });
     }
 
     public async Task<IActionResult> Mis()
     {
         var cid = ClienteId;
-        return View(await _db.Reservas.Include(r => r.Tour).Include(r => r.Cliente)
+        return View(await _db.Reservas.Include(r => r.Tour).Include(r => r.Cliente).Include(r => r.Pagos)
             .Where(r => r.ClienteId == cid).OrderByDescending(r => r.FechaReserva).ToListAsync());
     }
 
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Index() =>
-        View(await _db.Reservas.Include(r => r.Tour).Include(r => r.Cliente)
+        View(await _db.Reservas.Include(r => r.Tour).Include(r => r.Cliente).Include(r => r.Pagos)
             .OrderByDescending(r => r.FechaReserva).ToListAsync());
 
     [HttpPost, ValidateAntiForgeryToken]

@@ -5,11 +5,25 @@
     <tbody>
     @foreach (var r in Model)
     {
+        var vencida = r.PendienteVencida;
+        var estadoTxt = vencida ? "Vencida" : r.Estado;
+        var pillCls = estadoTxt == "Confirmada" ? "" : estadoTxt == "Pendiente" ? "is-pending" : "is-off";
+        var pagada = r.Pagos.Any(p => p.Estado == "Aprobado");
         <tr>
             <td>@r.FechaReserva.ToString("dd/MM/yyyy HH:mm")</td>
             @if (admin) { <td>@r.Cliente?.Nombre</td> }
-            <td>@r.Tour?.Titulo</td><td>@r.CantidadPersonas</td><td>$@r.Total.ToString("0.00")</td><td>@r.Estado</td>
+            <td>@r.Tour?.Titulo</td><td>@r.CantidadPersonas</td><td>$@r.Total.ToString("0.00")</td><td><span class="status-pill @pillCls">@estadoTxt</span>
+                @if (r.Pagos.Any(x => x.Estado == "Reembolso pendiente")) { <span class="status-pill is-pending">Reembolso pendiente</span> }</td>
             <td class="acts">
+                @if (!admin && r.Estado == "Pendiente" && !vencida)
+                {
+                    <a class="btn btn-sm" asp-controller="Pagos" asp-action="Checkout" asp-route-id="@r.Id">Pagar ahora</a>
+                }
+                @if (!admin && pagada)
+                {
+                    <a asp-controller="Pagos" asp-action="Recibo" asp-route-id="@r.Id">Recibo</a>
+                    <a asp-controller="Pagos" asp-action="Factura" asp-route-id="@r.Id">Factura</a>
+                }
                 @if (r.Estado != "Cancelada")
                 {
                     <form method="post" asp-action="Cancelar" asp-route-id="@r.Id" onsubmit="return confirm('¿Cancelar esta reserva?')"><button class="link">Cancelar</button></form>

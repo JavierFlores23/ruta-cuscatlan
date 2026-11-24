@@ -1,0 +1,78 @@
+@model PagoViewModel
+@{
+    ViewData["Title"] = "Pagar reserva";
+    var r = Model.Reserva!;
+    var t = r.Tour!;
+    var configurado = ViewBag.WompiConfigurado is bool b && b;
+    var hayPendiente = r.Pagos.Any(p => p.Proveedor.StartsWith("Wompi") && p.Estado == "Pendiente");
+}
+<section class="checkout">
+    <div class="wrap">
+        <p class="eyebrow">Último paso</p>
+        <h1 class="about-title">Paga y confirma tu reserva</h1>
+
+        <div class="demo-banner" role="note">
+            <strong>Pago seguro con Wompi.</strong> Pagarás en la pantalla de Wompi con tu tarjeta. Esta página nunca ve ni guarda los datos de tu tarjeta.
+        </div>
+
+        <div class="checkout-grid">
+            <div class="checkout-main reveal">
+                @if (ViewBag.Rechazo is string aviso)
+                {
+                    <div class="msg err" role="alert">@aviso</div>
+                }
+                @if (!configurado)
+                {
+                    <div class="msg err" role="alert">Wompi todavía no está configurado en este sistema. Faltan las credenciales (ClientId, ClientSecret y EmailNotificacion).</div>
+                }
+                else
+                {
+                    <div class="wompi-box">
+                        <h2>Total a pagar</h2>
+                        <p class="wompi-total">$@r.Total.ToString("0.00")</p>
+                        <p class="secure-note">Al continuar te llevaremos a Wompi para completar el pago. Cuando termines, volverás aquí y tu reserva quedará confirmada automáticamente.</p>
+                        <form method="post" asp-action="IniciarWompi" asp-route-id="@r.Id" id="payForm">
+                            <button class="btn pay-btn" id="payBtn" type="submit"><span class="pay-label">Pagar con Wompi →</span><span class="spinner" aria-hidden="true"></span></button>
+                        </form>
+                        @if (hayPendiente)
+                        {
+                            <p class="secure-note">¿Ya pagaste y no te devolvimos aquí? <a asp-action="Retorno" asp-route-id="@r.Id">Verificar mi pago</a></p>
+                        }
+                    </div>
+                }
+            </div>
+
+            <aside class="order-summary reveal">
+                <h2>Resumen</h2>
+                @if (!string.IsNullOrEmpty(t.Destino?.ImagenUrl))
+                {
+                    <img src="@(t.Destino?.ImagenUrl)" alt="@(t.Destino?.Nombre)" loading="lazy">
+                }
+                <dl>
+                    <div><dt>Tour</dt><dd>@t.Titulo</dd></div>
+                    <div><dt>Destino</dt><dd>@t.Destino?.Nombre</dd></div>
+                    <div><dt>Salida</dt><dd>@t.FechaSalida.ToString("dd/MM/yyyy HH:mm")</dd></div>
+                    <div><dt>Personas</dt><dd>@r.CantidadPersonas</dd></div>
+                    <div><dt>Precio por persona</dt><dd>$@t.Precio.ToString("0.00")</dd></div>
+                    <div class="total"><dt>Total</dt><dd>$@r.Total.ToString("0.00")</dd></div>
+                </dl>
+                <p class="hold" id="hold" data-segundos="@Model.Segundos">Cupo apartado: <strong id="holdTime">--:--</strong></p>
+                <a asp-controller="Reservas" asp-action="Mis">Pagar después</a>
+            </aside>
+        </div>
+    </div>
+</section>
+@section Scripts {
+<script src="~/js/pago.js" asp-append-version="true"></script>
+<script>
+(function () {
+  var f = document.getElementById('payForm'), b = document.getElementById('payBtn');
+  if (!f || !b || f.querySelector('#Numero')) return;
+  f.addEventListener('submit', function () {
+    b.classList.add('loading');
+    b.querySelector('.pay-label').textContent = 'Conectando con Wompi…';
+    setTimeout(function () { b.disabled = true; }, 0);
+  });
+})();
+</script>
+}

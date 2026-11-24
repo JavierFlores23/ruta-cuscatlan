@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Tour> Tours => Set<Tour>();
     public DbSet<Cliente> Clientes => Set<Cliente>();
     public DbSet<Reserva> Reservas => Set<Reserva>();
+    public DbSet<Pago> Pagos => Set<Pago>();
     public DbSet<Usuario> Usuarios => Set<Usuario>();
 
     protected override void OnModelCreating(ModelBuilder b)

@@ -12,4 +12,6 @@ public class HomeController : Controller
     public async Task<IActionResult> Index() =>
         View(await _db.Destinos.Include(d => d.Departamento).Include(d => d.Categoria)
             .Where(d => d.Activo).OrderBy(d => d.Nombre).ToListAsync());
+
+    public IActionResult Nosotros() => View();
 }

@@ -1,0 +1,45 @@
+@model ReciboViewModel
+@{
+    ViewData["Title"] = "Recibo de pago";
+    var r = Model.Reserva;
+    var p = Model.Pago;
+    var t = r.Tour!;
+    var metodo = !string.IsNullOrEmpty(p.Ultimos4)
+        ? $"{p.Marca} •••• {p.Ultimos4}"
+        : p.Proveedor + (string.IsNullOrEmpty(p.Marca) ? "" : " · " + p.Marca);
+}
+<section class="receipt-page">
+    <div class="wrap narrow">
+        <div class="receipt reveal">
+            <svg class="check" viewBox="0 0 52 52" aria-hidden="true">
+                <circle cx="26" cy="26" r="23" pathLength="1"/>
+                <path d="M15 27 l8 8 l15 -17" pathLength="1"/>
+            </svg>
+            <h1>Pago aprobado</h1>
+            <p class="lead">Tu reserva está confirmada. ¡Nos vemos en la ruta!</p>
+            <dl class="receipt-list">
+                <div><dt>Referencia</dt><dd>@p.Referencia</dd></div>
+                <div><dt>Fecha de pago</dt><dd>@p.Fecha.ToString("dd/MM/yyyy HH:mm")</dd></div>
+                <div><dt>Método</dt><dd>@metodo</dd></div>
+                <div><dt>Tour</dt><dd>@t.Titulo</dd></div>
+                <div><dt>Destino</dt><dd>@t.Destino?.Nombre</dd></div>
+                <div><dt>Salida</dt><dd>@t.FechaSalida.ToString("dd/MM/yyyy HH:mm")</dd></div>
+                <div><dt>Personas</dt><dd>@r.CantidadPersonas</dd></div>
+                <div class="total"><dt>Total pagado</dt><dd>$@p.Monto.ToString("0.00")</dd></div>
+            </dl>
+            @if (p.Proveedor == "Simulado")
+            {
+                <p class="demo-note">Pago simulado con fines de demostración. No se realizó ningún cobro real.</p>
+            }
+            else if (p.Proveedor.Contains("pruebas"))
+            {
+                <p class="demo-note">Pago de prueba en Wompi: no se realizó ningún cobro real.</p>
+            }
+            <div class="receipt-actions">
+                <a class="btn" asp-action="Factura" asp-route-id="@r.Id">Ver factura</a>
+                <button type="button" class="link-btn" onclick="window.print()">Imprimir recibo</button>
+                <a asp-controller="Reservas" asp-action="Mis">Mis reservas</a>
+            </div>
+        </div>
+    </div>
+</section>

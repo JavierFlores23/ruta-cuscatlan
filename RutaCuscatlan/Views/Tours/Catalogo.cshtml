@@ -40,7 +40,7 @@
                 @for (var i = 0; i < Model.Count; i++)
                 {
                     var t = Model[i];
-                    <article class="card tour-card">
+                    <article class="card tour-card reveal">
                         <div class="@("pic p" + (i % 6 + 1)) tour-photo">
                             @if (!string.IsNullOrWhiteSpace(t.Destino?.ImagenUrl))
                             {

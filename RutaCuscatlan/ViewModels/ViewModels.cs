@@ -23,3 +23,19 @@ public class ReservaViewModel
     [Range(1, 50, ErrorMessage = "Indica entre 1 y 50 personas")] public int Personas { get; set; } = 1;
     public Tour? Tour { get; set; }
 }
+
+public class PagoViewModel
+{
+    [Required(ErrorMessage = "Escribe el nombre del titular."), StringLength(80)] public string Titular { get; set; } = "";
+    [Required(ErrorMessage = "Escribe el número de tarjeta.")] public string Numero { get; set; } = "";
+    [Required(ErrorMessage = "Indica el vencimiento (MM/AA).")] public string Vencimiento { get; set; } = "";
+    [Required(ErrorMessage = "Escribe el CVC."), RegularExpression(@"^\d{3,4}$", ErrorMessage = "El CVC tiene 3 o 4 dígitos.")] public string Cvc { get; set; } = "";
+    public Reserva? Reserva { get; set; }
+    public int Segundos { get; set; }
+}
+
+public class ReciboViewModel
+{
+    public Reserva Reserva { get; set; } = null!;
+    public Pago Pago { get; set; } = null!;
+}

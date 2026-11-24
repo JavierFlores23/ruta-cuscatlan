@@ -1,11 +1,25 @@
 @model ReservaViewModel
-@{ ViewData["Title"] = "Reservar"; var t = Model.Tour!; }
+@{ ViewData["Title"] = "Reservar"; var t = Model.Tour!; var precioAttr = t.Precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture); }
 <section><div class="wrap narrow">
     <h2>Reservar: @t.Titulo</h2>
     <p class="lead">@t.Destino?.Nombre · Sale el @t.FechaSalida.ToString("dd/MM/yyyy HH:mm") · $@t.Precio.ToString("0.00") por persona · @t.Disponibles cupos</p>
     <form method="post" class="form">
         <input type="hidden" asp-for="TourId" />
-        <label>Personas<input asp-for="Personas" type="number" min="1" max="@t.Disponibles" /><span class="errtxt" asp-validation-for="Personas"></span></label>
-        <div><button class="btn">Confirmar reserva</button> <a asp-controller="Tours" asp-action="Catalogo">Volver</a></div>
+        <label>Personas<input asp-for="Personas" id="Personas" data-precio="@precioAttr" type="number" min="1" max="@t.Disponibles" /><span class="errtxt" asp-validation-for="Personas"></span></label>
+        <p class="lead" style="margin:0">Total a pagar: <strong id="totalPagar">$@t.Precio.ToString("0.00")</strong></p>
+        <div><button class="btn">Continuar al pago →</button> <a asp-controller="Tours" asp-action="Catalogo">Volver</a></div>
     </form>
 </div></section>
+@section Scripts {
+<script>
+(function () {
+  var input = document.getElementById('Personas'), out = document.getElementById('totalPagar');
+  if (!input || !out) return;
+  function upd() {
+    var n = Math.max(parseInt(input.value, 10) || 0, 0);
+    out.textContent = '$' + (n * parseFloat(input.dataset.precio)).toFixed(2);
+  }
+  input.addEventListener('input', upd); upd();
+})();
+</script>
+}

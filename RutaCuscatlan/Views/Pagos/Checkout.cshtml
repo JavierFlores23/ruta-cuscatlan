@@ -1,0 +1,85 @@
+@model PagoViewModel
+@{
+    ViewData["Title"] = "Pagar reserva";
+    var r = Model.Reserva!;
+    var t = r.Tour!;
+}
+<section class="checkout">
+    <div class="wrap">
+        <p class="eyebrow">Último paso</p>
+        <h1 class="about-title">Paga y confirma tu reserva</h1>
+
+        <div class="demo-banner" role="note">
+            <strong>Modo demostración.</strong> Este pago es simulado: no se cobra dinero real. No escribas los datos de tu tarjeta verdadera.
+        </div>
+
+        <div class="checkout-grid">
+            <div class="checkout-main reveal">
+                <div class="test-cards">
+                    <span>Tarjetas de prueba:</span>
+                    <button type="button" class="chip" data-numero="4242 4242 4242 4242">Aprobada</button>
+                    <button type="button" class="chip" data-numero="4000 0000 0000 0002">Rechazada</button>
+                    <button type="button" class="chip" data-numero="4000 0000 0000 9995">Sin fondos</button>
+                </div>
+
+                <div class="cc-preview" aria-hidden="true">
+                    <div class="cc-top"><span class="cc-chip"></span><span class="cc-brand" id="ccBrand">Tarjeta</span></div>
+                    <div class="cc-number" id="ccNumber">•••• •••• •••• ••••</div>
+                    <div class="cc-bottom">
+                        <div><small>Titular</small><span id="ccName">NOMBRE APELLIDO</span></div>
+                        <div><small>Vence</small><span id="ccExp">MM/AA</span></div>
+                    </div>
+                </div>
+
+                @if (ViewBag.Rechazo is string rechazo)
+                {
+                    <div class="msg err" role="alert">@rechazo</div>
+                }
+
+                <form method="post" asp-action="Checkout" asp-route-id="@r.Id" class="form pay-form" id="payForm" autocomplete="on">
+                    <label>Titular de la tarjeta
+                        <input asp-for="Titular" id="Titular" autocomplete="cc-name" placeholder="Nombre como aparece en la tarjeta" maxlength="80" required />
+                        <span class="errtxt" asp-validation-for="Titular"></span>
+                    </label>
+                    <label>Número de tarjeta
+                        <input id="Numero" name="Numero" value="@Model.Numero" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" maxlength="23" required />
+                        <span class="errtxt" asp-validation-for="Numero"></span>
+                    </label>
+                    <div class="pay-row">
+                        <label>Vencimiento
+                            <input asp-for="Vencimiento" id="Vencimiento" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5" required />
+                            <span class="errtxt" asp-validation-for="Vencimiento"></span>
+                        </label>
+                        <label>CVC
+                            <input id="Cvc" name="Cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4" required />
+                            <span class="errtxt" asp-validation-for="Cvc"></span>
+                        </label>
+                    </div>
+                    <button class="btn pay-btn" id="payBtn" type="submit"><span class="pay-label">Pagar $@r.Total.ToString("0.00")</span><span class="spinner" aria-hidden="true"></span></button>
+                    <p class="secure-note">Solo guardamos la marca y los últimos 4 dígitos. El número completo y el CVC nunca se almacenan.</p>
+                </form>
+            </div>
+
+            <aside class="order-summary reveal">
+                <h2>Resumen</h2>
+                @if (!string.IsNullOrEmpty(t.Destino?.ImagenUrl))
+                {
+                    <img src="@(t.Destino?.ImagenUrl)" alt="@(t.Destino?.Nombre)" loading="lazy">
+                }
+                <dl>
+                    <div><dt>Tour</dt><dd>@t.Titulo</dd></div>
+                    <div><dt>Destino</dt><dd>@t.Destino?.Nombre</dd></div>
+                    <div><dt>Salida</dt><dd>@t.FechaSalida.ToString("dd/MM/yyyy HH:mm")</dd></div>
+                    <div><dt>Personas</dt><dd>@r.CantidadPersonas</dd></div>
+                    <div><dt>Precio por persona</dt><dd>$@t.Precio.ToString("0.00")</dd></div>
+                    <div class="total"><dt>Total</dt><dd>$@r.Total.ToString("0.00")</dd></div>
+                </dl>
+                <p class="hold" id="hold" data-segundos="@Model.Segundos">Cupo apartado: <strong id="holdTime">--:--</strong></p>
+                <a asp-controller="Reservas" asp-action="Mis">Pagar después</a>
+            </aside>
+        </div>
+    </div>
+</section>
+@section Scripts {
+<script src="~/js/pago.js" asp-append-version="true"></script>
+}

@@ -157,6 +157,55 @@ namespace RutaCuscatlan.Data.Migrations
                     b.ToTable("Guias");
                 });
 
+            modelBuilder.Entity("RutaCuscatlan.Models.Pago", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Marca")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Mensaje")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Monto")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("Proveedor")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Referencia")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ReservaId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Ultimos4")
+                        .HasMaxLength(4)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservaId");
+
+                    b.ToTable("Pagos");
+                });
+
             modelBuilder.Entity("RutaCuscatlan.Models.Reserva", b =>
                 {
                     b.Property<int>("Id")
@@ -289,6 +338,17 @@ namespace RutaCuscatlan.Data.Migrations
                     b.Navigation("Departamento");
                 });
 
+            modelBuilder.Entity("RutaCuscatlan.Models.Pago", b =>
+                {
+                    b.HasOne("RutaCuscatlan.Models.Reserva", "Reserva")
+                        .WithMany("Pagos")
+                        .HasForeignKey("ReservaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reserva");
+                });
+
             modelBuilder.Entity("RutaCuscatlan.Models.Reserva", b =>
                 {
                     b.HasOne("RutaCuscatlan.Models.Cliente", "Cliente")
@@ -357,6 +417,11 @@ namespace RutaCuscatlan.Data.Migrations
             modelBuilder.Entity("RutaCuscatlan.Models.Guia", b =>
                 {
                     b.Navigation("Tours");
+                });
+
+            modelBuilder.Entity("RutaCuscatlan.Models.Reserva", b =>
+                {
+                    b.Navigation("Pagos");
                 });
 
             modelBuilder.Entity("RutaCuscatlan.Models.Tour", b =>

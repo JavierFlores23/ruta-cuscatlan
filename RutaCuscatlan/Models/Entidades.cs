@@ -60,7 +60,7 @@ public class Tour
     public List<Reserva> Reservas { get; set; } = new();
 
     [NotMapped]
-    public int Disponibles => CupoMaximo - Reservas.Where(r => r.Estado != "Cancelada").Sum(r => r.CantidadPersonas);
+    public int Disponibles => CupoMaximo - Reservas.Where(r => r.Estado != "Cancelada" && !r.PendienteVencida).Sum(r => r.CantidadPersonas);
 }
 
 public class Cliente
@@ -83,6 +83,28 @@ public class Reserva
     public Tour? Tour { get; set; }
     public int ClienteId { get; set; }
     public Cliente? Cliente { get; set; }
+    public List<Pago> Pagos { get; set; } = new();
+
+    /// <summary>Minutos que se guarda el cupo mientras el cliente paga.</summary>
+    public const int MinutosCupo = 15;
+
+    [NotMapped]
+    public bool PendienteVencida => Estado == "Pendiente" && FechaReserva < DateTime.Now.AddMinutes(-MinutosCupo);
+}
+
+public class Pago
+{
+    public int Id { get; set; }
+    public int ReservaId { get; set; }
+    public Reserva? Reserva { get; set; }
+    [Column(TypeName = "decimal(10,2)")] public decimal Monto { get; set; }
+    [Required, StringLength(20)] public string Estado { get; set; } = "Aprobado"; // Aprobado, Rechazado, Reembolsado
+    [Required, StringLength(30)] public string Proveedor { get; set; } = "Simulado";
+    [Required, StringLength(40)] public string Referencia { get; set; } = "";
+    [StringLength(20)] public string? Marca { get; set; }
+    [StringLength(4)] public string? Ultimos4 { get; set; } // Nunca se guarda el número completo ni el CVC
+    [StringLength(200)] public string? Mensaje { get; set; }
+    public DateTime Fecha { get; set; } = DateTime.Now;
 }
 
 public class Usuario

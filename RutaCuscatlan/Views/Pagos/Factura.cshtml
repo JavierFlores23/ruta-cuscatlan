@@ -1,0 +1,90 @@
+@using Microsoft.Extensions.Options
+@using RutaCuscatlan.Services
+@inject IOptions<FacturacionOptions> FacturacionConfig
+@model ReciboViewModel
+@{
+    ViewData["Title"] = "Factura";
+    var e = FacturacionConfig.Value;
+    var r = Model.Reserva;
+    var p = Model.Pago;
+    var t = r.Tour!;
+    var c = r.Cliente;
+    const decimal tasaIva = 0.13m;
+    var subtotal = Math.Round(p.Monto / (1 + tasaIva), 2);
+    var iva = p.Monto - subtotal;
+    var numero = $"FAC-{p.Fecha:yyyy}-{p.Id:D6}";
+    var metodo = !string.IsNullOrEmpty(p.Ultimos4)
+        ? $"{p.Marca} •••• {p.Ultimos4}"
+        : p.Proveedor + (string.IsNullOrEmpty(p.Marca) ? "" : " · " + p.Marca);
+    var esPrueba = p.Proveedor == "Simulado" || p.Proveedor.Contains("pruebas");
+}
+<section class="receipt-page">
+    <div class="wrap narrow">
+        <article class="invoice reveal">
+            <header class="inv-head">
+                <div>
+                    <h1>@(string.IsNullOrWhiteSpace(e.NombreComercial) ? "Ruta Cuscatlán" : e.NombreComercial)</h1>
+                    @if (!string.IsNullOrWhiteSpace(e.RazonSocial)) { <p>@e.RazonSocial</p> }
+                    @if (!string.IsNullOrWhiteSpace(e.Nit)) { <p>NIT: @e.Nit</p> }
+                    @if (!string.IsNullOrWhiteSpace(e.Nrc)) { <p>NRC: @e.Nrc</p> }
+                    @if (!string.IsNullOrWhiteSpace(e.Direccion)) { <p>@e.Direccion</p> }
+                    @if (!string.IsNullOrWhiteSpace(e.Telefono)) { <p>Tel. @e.Telefono</p> }
+                    @if (!string.IsNullOrWhiteSpace(e.Correo)) { <p>@e.Correo</p> }
+                </div>
+                <div class="inv-meta">
+                    <strong>FACTURA</strong>
+                    <span>N.º @numero</span>
+                    <span>Fecha: @p.Fecha.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+            </header>
+
+            <div class="inv-parties">
+                <div>
+                    <small>Cliente</small>
+                    <strong>@c?.Nombre</strong>
+                    <span>@c?.Correo</span>
+                    @if (!string.IsNullOrWhiteSpace(c?.Telefono)) { <span>@(c?.Telefono)</span> }
+                </div>
+                <div>
+                    <small>Pago</small>
+                    <strong>@metodo</strong>
+                    <span>Ref. @p.Referencia</span>
+                    <span>Reserva #@r.Id</span>
+                </div>
+            </div>
+
+            <div class="inv-scroll">
+                <table class="inv-table">
+                    <thead><tr><th>Descripción</th><th class="num">Cant.</th><th class="num">Precio unit.</th><th class="num">Importe</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>@t.Titulo</strong><br>
+                                <small>@t.Destino?.Nombre · salida @t.FechaSalida.ToString("dd/MM/yyyy HH:mm")</small>
+                            </td>
+                            <td class="num">@r.CantidadPersonas</td>
+                            <td class="num">$@t.Precio.ToString("0.00")</td>
+                            <td class="num">$@r.Total.ToString("0.00")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <dl class="inv-totals">
+                <div><dt>Subtotal (sin IVA)</dt><dd>$@subtotal.ToString("0.00")</dd></div>
+                <div><dt>IVA 13%</dt><dd>$@iva.ToString("0.00")</dd></div>
+                <div class="total"><dt>Total pagado</dt><dd>$@p.Monto.ToString("0.00")</dd></div>
+            </dl>
+
+            <p class="inv-legal">Precios con IVA incluido.
+                @if (esPrueba) { <text> Pago de prueba: no se realizó ningún cobro real.</text> }
+                Documento informativo; no es un Documento Tributario Electrónico (DTE) emitido ante el Ministerio de Hacienda.</p>
+        </article>
+
+        <div class="receipt-actions inv-actions">
+            <button type="button" class="btn" onclick="window.print()">Imprimir factura</button>
+            <a asp-action="Recibo" asp-route-id="@r.Id">Ver recibo</a>
+            <a asp-controller="Reservas" asp-action="Mis">Mis reservas</a>
+        </div>
+    </div>
+</section>

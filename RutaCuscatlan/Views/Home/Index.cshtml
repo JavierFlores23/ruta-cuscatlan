@@ -1,32 +1,49 @@
 @model List<Destino>
-@{ ViewData["Title"] = "Descubre El Salvador"; }
+@{
+    ViewData["Title"] = "Descubre El Salvador";
+    var totalDepartamentos = Model.Where(d => d.Departamento != null).Select(d => d.Departamento!.Nombre).Distinct().Count();
+    var totalCategorias = Model.Where(d => d.Categoria != null).Select(d => d.Categoria!.Nombre).Distinct().Count();
+}
 <header class="hero">
+    <div class="hero-glow glow-a" aria-hidden="true"></div>
+    <div class="hero-glow glow-b" aria-hidden="true"></div>
     <div class="wrap hero-layout">
-        <div class="hero-copy">
-            <p class="hero-kicker">Rutas locales · El Salvador</p>
-            <h1>Un país pequeño. Días que se sienten enormes.</h1>
-            <p>Explora pueblos, volcanes y costa. Encuentra una salida y reserva tu lugar desde aquí.</p>
+        <div class="hero-copy" data-hero-copy>
+            <p class="hero-kicker"><span class="kicker-dot" aria-hidden="true"></span>Rutas locales · El Salvador</p>
+            <h1>Un país pequeño. Días que se sienten <span class="accent">enormes.</span></h1>
+            <p class="hero-lead">Explora pueblos, volcanes y costa. Encuentra una salida y reserva tu lugar desde aquí.</p>
             <div class="hero-actions">
-                <a class="btn" asp-controller="Tours" asp-action="Catalogo">Explorar tours</a>
+                <a class="btn" asp-controller="Tours" asp-action="Catalogo">Explorar tours <span aria-hidden="true" class="btn-arrow">→</span></a>
                 <a class="hero-secondary" href="#destinos">Conocer destinos <span aria-hidden="true">↓</span></a>
             </div>
+            <dl class="hero-stats">
+                <div><dt>Destinos</dt><dd data-count="@Model.Count">@Model.Count</dd></div>
+                <div><dt>Departamentos</dt><dd data-count="@totalDepartamentos">@totalDepartamentos</dd></div>
+                <div><dt>Categorías</dt><dd data-count="@totalCategorias">@totalCategorias</dd></div>
+            </dl>
         </div>
-        <div class="hero-art" aria-hidden="true">
-            <span class="hero-sun"></span>
-            <span class="hero-mountain mountain-back"></span>
-            <span class="hero-mountain mountain-front"></span>
-            <span class="hero-route route-one"></span>
-            <span class="hero-route route-two"></span>
-            <span class="route-stop stop-one"></span>
-            <span class="route-stop stop-two"></span>
-            <span class="route-stop stop-three"></span>
-            <span class="hero-caption">Tu próxima ruta</span>
+        <div class="hero-collage" data-parallax aria-hidden="true">
+            <svg class="hero-path" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
+                <path d="M18 78 C 30 52, 44 66, 54 46 S 74 30, 84 20" pathLength="1" vector-effect="non-scaling-stroke"/>
+            </svg>
+            <figure class="hero-photo photo-a" style="--k:-.07">
+                <img src="~/images/destinos/lago-coatepeque.jpg" alt="" loading="eager">
+                <figcaption>Lago de Coatepeque</figcaption>
+            </figure>
+            <figure class="hero-photo photo-b" style="--k:.06">
+                <img src="~/images/destinos/volcan-santa-ana.jpg" alt="" loading="eager">
+                <figcaption>Volcán de Santa Ana</figcaption>
+            </figure>
+            <figure class="hero-photo photo-c" style="--k:-.03">
+                <img src="~/images/destinos/suchitoto.jpg" alt="" loading="eager">
+                <figcaption>Suchitoto</figcaption>
+            </figure>
         </div>
     </div>
 </header>
 <section id="destinos" class="destinations-section">
     <div class="wrap">
-        <div class="section-heading">
+        <div class="section-heading reveal">
             <div>
                 <p class="eyebrow">Escoge tu siguiente parada</p>
                 <h2>Destinos para salir de la rutina</h2>
@@ -36,7 +53,7 @@
         </div>
         @if (Model.Count == 0)
         {
-            <div class="empty-state"><h2>Estamos preparando las rutas</h2><p>Vuelve pronto para ver los destinos disponibles.</p></div>
+            <div class="empty-state reveal"><h2>Estamos preparando las rutas</h2><p>Vuelve pronto para ver los destinos disponibles.</p></div>
         }
         else
         {
@@ -44,7 +61,7 @@
                 @for (var i = 0; i < Model.Count; i++)
                 {
                     var d = Model[i];
-                    <article class="card destination-card">
+                    <article class="card destination-card reveal">
                         <div class="@("pic p" + (i % 6 + 1)) destination-photo">
                             @if (!string.IsNullOrWhiteSpace(d.ImagenUrl))
                             {
@@ -73,5 +90,30 @@
                 }
             </div>
         }
+    </div>
+</section>
+
+<section id="como" class="how-section">
+    <div class="wrap">
+        <div class="reveal">
+            <p class="eyebrow">Así de simple</p>
+            <h2>De la idea a tu lugar reservado</h2>
+        </div>
+        <ol class="steps">
+            <li class="step reveal"><span class="step-num">01</span><h3>Explora</h3><p>Recorre los destinos y encuentra el que te llame la atención.</p></li>
+            <li class="step reveal"><span class="step-num">02</span><h3>Elige tu salida</h3><p>Compara tours, fechas y cupos disponibles en un solo lugar.</p></li>
+            <li class="step reveal"><span class="step-num">03</span><h3>Reserva</h3><p>Aparta tu lugar en unos pasos y consulta tus reservas cuando quieras.</p></li>
+        </ol>
+    </div>
+</section>
+<section class="cta-section">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <div>
+                <h2>¿Listo para tu próxima ruta?</h2>
+                <p>Revisa los tours disponibles y aparta tu lugar hoy.</p>
+            </div>
+            <a class="btn" asp-controller="Tours" asp-action="Catalogo">Ver tours <span aria-hidden="true" class="btn-arrow">→</span></a>
+        </div>
     </div>
 </section>
